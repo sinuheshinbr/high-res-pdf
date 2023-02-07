@@ -128,6 +128,27 @@ const orgChart = {
   ],
 };
 
+const renderForeignObjectNode = ({
+  nodeDatum,
+  toggleNode,
+  foreignObjectProps,
+}) => (
+  <g>
+    <circle r={15}></circle>
+    {/* `foreignObject` requires width & height to be explicitly set. */}
+    <foreignObject {...foreignObjectProps}>
+      <div style={{ border: "1px solid black", backgroundColor: "#dedede" }}>
+        <h3 style={{ textAlign: "center" }}>{nodeDatum.name}</h3>
+        {nodeDatum.children && (
+          <button style={{ width: "100%" }} onClick={toggleNode}>
+            {nodeDatum.__rd3t.collapsed ? "Expand" : "Collapse"}
+          </button>
+        )}
+      </div>
+    </foreignObject>
+  </g>
+);
+
 const Home: NextPage = () => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -140,6 +161,9 @@ const Home: NextPage = () => {
     pdf.addImage(canvas, "png", 0, 0, width, height);
     pdf.save();
   };
+
+  const nodeSize = { x: 200, y: 200 };
+  const foreignObjectProps = { width: nodeSize.x, height: nodeSize.y, x: 20 };
   return (
     <>
       <button
@@ -152,6 +176,9 @@ const Home: NextPage = () => {
       </button>
       <div ref={ref} id="treeWrapper" className="h-[600px] w-[3000px]">
         <Tree
+          renderCustomNodeElement={(rd3tProps) =>
+            renderForeignObjectNode({ ...rd3tProps, foreignObjectProps })
+          }
           zoomable={false}
           orientation="vertical"
           translate={{ x: 1400, y: 100 }}
